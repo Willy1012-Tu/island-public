@@ -1,0 +1,4 @@
+-r requirements-web.txt
+pywebview==6.2.1
+pystray>=0.19.5,<1
+Pillow>=10,<13

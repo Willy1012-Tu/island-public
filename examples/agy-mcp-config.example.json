@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "island-office": {
+      "command": "C:/PLACEHOLDER_PROJECT/island-public/.venv-desktop/Scripts/python.exe",
+      "args": [
+        "C:/PLACEHOLDER_PROJECT/island-public/tools/island_mcp.py",
+        "--project",
+        "C:/PLACEHOLDER_PROJECT/island-public",
+        "--data-dir",
+        "C:/PLACEHOLDER_PRIVATE_DATA/AgentDeskPublic"
+      ],
+      "cwd": "C:/PLACEHOLDER_PROJECT/island-public",
+      "enabledTools": [
+        "island_status",
+        "island_start_collaboration",
+        "island_get_task",
+        "island_cancel_task",
+        "island_review_changes"
+      ],
+      "timeoutSeconds": 60
+    }
+  }
+}

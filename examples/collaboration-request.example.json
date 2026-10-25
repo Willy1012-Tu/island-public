@@ -1,0 +1,14 @@
+{
+  "provider": "antigravity",
+  "prompt": "請先分析專案，委派 Codex 在隔離副本提出一個小幅程式修正，再交由 Claude 靜態審查。完成後提供修改摘要與可審查的差異，等待我在辦公室確認套用。",
+  "collaboration": {
+    "members": [
+      {
+        "provider": "codex"
+      },
+      {
+        "provider": "claude"
+      }
+    ]
+  }
+}

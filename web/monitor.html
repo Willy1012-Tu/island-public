@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1518">
+  <meta name="description" content="走進 Codex、Claude 4.6 與 Antigravity 的獨立 3D 辦公室，即時觀察模型任務。">
+  <title>Agent Desk — 模型辦公室</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23142529'/%3E%3Cpath d='M10 27V13h7v14m6 0V9h7v18' stroke='%23b1d8af' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/monitor.css">
+  <script type="importmap">
+    {"imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+    }}
+  </script>
+</head>
+<body>
+  <header class="desk-header">
+    <a class="desk-brand" href="/monitor" aria-label="任務觀測站首頁"><span class="brand-icon" aria-hidden="true">▥</span><span>AGENT<span class="brand-light">DESK</span><small>任務觀測站</small></span></a>
+    <nav class="header-actions" aria-label="觀測站導航"><a class="island-link" href="/island">去雲上小島 <span aria-hidden="true">↗</span></a><span class="connection connecting" id="monitor-connection" role="status"><i></i><span id="connection-text">連線中</span></span></nav>
+  </header>
+  <main class="desk-main">
+    <section class="desk-intro" aria-labelledby="page-title">
+      <div><span class="eyebrow">A PLACE FOR EVERY MIND.</span><h1 id="page-title">各自一間，一起做事<span>.</span></h1><p>走進三間小辦公室，看見每個任務如何發生。</p></div>
+      <div class="overview" aria-label="工作站統計"><div><strong id="overview-running">—</strong><span>執行中</span></div><div><strong id="overview-available">—</strong><span>可用 CLI</span></div><div><strong id="overview-finished">—</strong><span>已完成</span></div></div>
+    </section>
+    <section class="office-section" aria-labelledby="office-title">
+      <div class="office-heading"><div><span class="eyebrow">THE MODEL WORKPLACE</span><h2 id="office-title">模型辦公室</h2></div><p id="office-summary">三個獨立空間，等待世界同步。</p></div>
+      <div class="office-stage">
+        <div id="office-scene" class="office-canvas" aria-label="可旋轉與縮放的三間獨立模型辦公室"></div>
+        <div class="office-toolbar"><span class="office-floor-tag"><i></i> THE LITTLE WORKPLACE</span><button class="office-reset" id="office-reset-camera" disabled aria-label="重置辦公室鏡頭" title="重置鏡頭"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6"/></svg><span>重置鏡頭</span></button></div>
+        <div class="office-loading" id="office-loading" role="status"><span class="office-loading-mark" aria-hidden="true">⌂</span><h3 id="office-loading-title">正在打開辦公室</h3><p id="office-loading-message">把桌椅擺好，給每一個念頭留個位置。</p><button class="office-retry" id="office-retry" hidden>重新載入頁面</button></div>
+        <div class="office-stage-note"><span><i class="office-work-dot"></i> 工作狀態來自真實任務</span><span>閒置小動作為預設演出 · 非 LLM</span></div>
+      </div>
+      <div class="office-caption"><div><span class="office-selection-dot"></span><strong id="office-selected-label">Codex 辦公室</strong><span id="office-selected-model">等待模型資訊</span></div><p>點選房間切換夥伴<span>左鍵旋轉 · 滾輪縮放 · 右鍵平移</span></p></div>
+    </section>
+    <div class="workspace-strip"><span><i aria-hidden="true"></i>工作目錄 <code id="workspace-path">等待伺服器狀態</code></span><button class="quiet-button" id="refresh-providers" disabled><span aria-hidden="true">↻</span> 重新偵測 CLI</button></div>
+    <div class="notice" id="error-banner" hidden role="alert"><span id="error-message"></span><button id="dismiss-error" aria-label="關閉提示">×</button></div>
+
+    <section class="provider-grid provider-grid--compact" id="provider-grid" aria-label="三間辦公室的任務摘要">
+      <article class="provider-card codex" id="codex-card" data-phase="loading" data-connected="false">
+        <div class="provider-heading"><div><span class="provider-kicker">THE BUILDER</span><h2 id="codex-name">Codex</h2></div><span class="phase-badge" id="codex-status">等待狀態</span></div>
+        <div class="avatar-stage" id="codex-avatar" aria-hidden="true"><div class="stage-floor"></div><svg class="buddy buddy-codex" viewBox="0 0 240 125"><g class="codex-block block-one"><path d="m34 92 13-7 13 7-13 8Z" fill="#c2d2a0"/><path d="m34 92 13 8v13l-13-8Z" fill="#79986d"/><path d="m47 100 13-8v13l-13 8Z" fill="#9db688"/></g><g class="codex-block block-two"><path d="m64 100 12-7 12 7-12 7Z" fill="#efd095"/><path d="m64 100 12 7v12l-12-7Z" fill="#a88a5b"/><path d="m76 107 12-7v12l-12 7Z" fill="#d1b178"/></g><g class="buddy-body"><rect x="100" y="76" width="17" height="27" rx="5" fill="#3e5960"/><rect x="125" y="76" width="17" height="27" rx="5" fill="#3e5960"/><rect x="96" y="53" width="50" height="37" rx="12" fill="#b8d7a4"/><rect x="87" y="58" width="14" height="29" rx="6" fill="#9abb88"/><rect x="142" y="58" width="14" height="29" rx="6" fill="#9abb88"/><rect x="99" y="21" width="44" height="38" rx="13" fill="#ffe1b5"/><path d="M97 29q3-22 24-22t24 22" fill="#77946e"/><path d="M93 29h56" stroke="#c5db9c" stroke-width="7" stroke-linecap="round"/><circle cx="112" cy="40" r="3" fill="#2b4545"/><circle cx="130" cy="40" r="3" fill="#2b4545"/><path d="M117 49h8" stroke="#8c7059" stroke-width="2" stroke-linecap="round"/><rect class="work-slate" x="153" y="58" width="29" height="23" rx="4" fill="#375c5b"/><path class="slate-lines" d="m158 65 4 3-4 3m8 0h8" stroke="#c0dfb2" stroke-width="2" fill="none"/></g><path d="M184 94h19m-9-5v10" stroke="#7c9d83" stroke-width="2" stroke-linecap="round" opacity=".6"/></svg></div>
+        <div class="persona-row"><strong id="codex-persona">等待夥伴狀態</strong><span id="codex-idle-label">尚未同步</span></div><p class="idle-line" id="codex-idle-line">正在確認 CLI 是否可用。</p>
+        <div class="provider-facts"><span id="codex-auth">登入未驗證</span><span id="codex-mode">等待執行模式</span></div><div class="provider-activity"><span class="activity-label" id="codex-tool">尚無任務</span><time id="codex-elapsed">—</time></div><p class="last-message" id="codex-message">任務的公開訊息將顯示在這裡。</p>
+        <p class="provider-model"><span id="codex-model">等待模型資訊</span><span id="codex-transport">Codex CLI</span></p>
+        <div class="provider-bottom"><button class="select-provider" id="codex-select">查看任務 <span aria-hidden="true">→</span></button><details><summary>安裝與登入</summary><p id="codex-reason">等待偵測結果。</p><p>依官方文件安裝 Codex CLI，執行 <code>codex login</code> 完成登入，再重新偵測。</p><a href="https://learn.chatgpt.com/docs/cli" target="_blank" rel="noopener noreferrer">Codex CLI 官方說明 ↗</a></details></div>
+      </article>
+
+      <article class="provider-card claude" id="claude-card" data-phase="loading" data-connected="false">
+        <div class="provider-heading"><div><span class="provider-kicker">CLAUDE · VIA ANTIGRAVITY</span><h2 id="claude-name">Claude 4.6</h2></div><span class="phase-badge" id="claude-status">等待狀態</span></div>
+        <div class="avatar-stage" id="claude-avatar" aria-hidden="true"><div class="stage-floor"></div><svg class="buddy buddy-claude" viewBox="0 0 240 125"><g class="claude-cloud"><path d="M47 37c-14 0-15-16-3-18 3-15 24-17 29-3 16-4 22 18 7 21Z" fill="#b6d4ce" opacity=".55"/><path d="M62 46h21" stroke="#98b7b0" stroke-width="2" stroke-linecap="round" opacity=".5"/></g><g class="buddy-body"><rect x="101" y="80" width="16" height="24" rx="5" fill="#5f5b5c"/><rect x="126" y="80" width="16" height="24" rx="5" fill="#5f5b5c"/><rect x="96" y="54" width="51" height="36" rx="12" fill="#d49c7d"/><rect x="86" y="60" width="14" height="27" rx="6" fill="#b9846d"/><rect x="144" y="60" width="14" height="27" rx="6" fill="#b9846d"/><rect x="99" y="22" width="45" height="38" rx="14" fill="#ffe0b5"/><path d="M99 32q-2-20 22-20t24 20" fill="#d9b491"/><path d="M94 31h55" stroke="#e9c6a3" stroke-width="7" stroke-linecap="round"/><circle cx="111" cy="41" r="3" fill="#57453e"/><circle cx="130" cy="41" r="3" fill="#57453e"/><path d="M117 50q5 4 9 0" stroke="#9b705c" stroke-width="2" fill="none" stroke-linecap="round"/><path d="m155 71 12-10 16 7-12 11Z" fill="#eee0ba"/><path d="m155 71 16 8v12l-16-8Z" fill="#c5b99a"/><path d="m171 79 12-11v12l-12 11Z" fill="#e2d2aa"/></g><g class="claude-spark"><path d="m186 32 4 9 10 4-10 4-4 9-4-9-10-4 10-4Z" fill="#e0bd91" opacity=".7"/></g></svg></div>
+        <div class="persona-row"><strong id="claude-persona">等待夥伴狀態</strong><span id="claude-idle-label">尚未同步</span></div><p class="idle-line" id="claude-idle-line">正在確認 CLI 是否可用。</p>
+        <div class="provider-facts"><span id="claude-auth">登入未驗證</span><span id="claude-mode">等待執行模式</span></div><div class="provider-activity"><span class="activity-label" id="claude-tool">尚無任務</span><time id="claude-elapsed">—</time></div><p class="last-message" id="claude-message">任務的公開訊息將顯示在這裡。</p>
+        <p class="provider-model"><span id="claude-model">等待 Claude 4.6 模型資訊</span><span id="claude-transport">Antigravity CLI</span></p>
+        <div class="provider-bottom"><button class="select-provider" id="claude-select">查看任務 <span aria-hidden="true">→</span></button><details><summary>連線與模型</summary><p id="claude-reason">等待偵測結果。</p><p>透過已登入的 Antigravity CLI 使用 Claude Sonnet 4.6 或 Opus 4.6 Thinking。執行 <code>python tools/setup_providers.py login antigravity</code> 完成帳號登入，再重新偵測。</p><a href="https://www.antigravity.google/docs/cli/headless/" target="_blank" rel="noopener noreferrer">Antigravity 模型與 CLI 說明 ↗</a></details></div>
+      </article>
+
+      <article class="provider-card antigravity" id="antigravity-card" data-phase="loading" data-connected="false">
+        <div class="provider-heading"><div><span class="provider-kicker">THE EXPLORER</span><h2 id="antigravity-name">Antigravity</h2></div><span class="phase-badge" id="antigravity-status">等待狀態</span></div>
+        <div class="avatar-stage" id="antigravity-avatar" aria-hidden="true"><div class="stage-floor"></div><svg class="buddy buddy-antigravity" viewBox="0 0 240 125"><ellipse class="orbit-track" cx="121" cy="63" rx="87" ry="31" fill="none" stroke="#6b9aaf" stroke-width="1" stroke-dasharray="3 7" opacity=".5"/><g class="orbiting-star"><path d="m52 43 4 7 8 1-6 6 1 8-7-4-7 4 1-8-6-6 8-1Z" fill="#9fcadd"/></g><g class="buddy-body"><rect x="101" y="80" width="16" height="24" rx="5" fill="#3e5968"/><rect x="126" y="80" width="16" height="24" rx="5" fill="#3e5968"/><rect x="96" y="54" width="51" height="36" rx="12" fill="#93bdca"/><rect x="86" y="60" width="14" height="27" rx="6" fill="#729dab"/><rect x="144" y="60" width="14" height="27" rx="6" fill="#729dab"/><rect x="99" y="21" width="45" height="39" rx="14" fill="#ffe0b5"/><path d="M98 29q2-20 23-20t24 20" fill="#668f9b"/><path d="M94 30h55" stroke="#afd4d7" stroke-width="7" stroke-linecap="round"/><circle cx="112" cy="41" r="3" fill="#35515d"/><circle cx="131" cy="41" r="3" fill="#35515d"/><path d="M117 50h8" stroke="#947660" stroke-width="2" stroke-linecap="round"/><path d="M120 64v12m-6-6h12" stroke="#dce9df" stroke-width="2"/><circle class="work-compass" cx="170" cy="74" r="13" fill="#456e7c"/><path d="m174 68-3 9-6 2 3-9Z" fill="#d5e9dc"/></g></svg></div>
+        <div class="persona-row"><strong id="antigravity-persona">等待夥伴狀態</strong><span id="antigravity-idle-label">尚未同步</span></div><p class="idle-line" id="antigravity-idle-line">正在確認 CLI 是否可用。</p>
+        <div class="provider-facts"><span id="antigravity-auth">登入未驗證</span><span id="antigravity-mode">等待執行模式</span></div><div class="provider-activity"><span class="activity-label" id="antigravity-tool">尚無任務</span><time id="antigravity-elapsed">—</time></div><p class="last-message" id="antigravity-message">任務的公開訊息將顯示在這裡。</p>
+        <p class="provider-model"><span id="antigravity-model">等待模型資訊</span><span id="antigravity-transport">Antigravity CLI</span></p>
+        <div class="provider-bottom"><button class="select-provider" id="antigravity-select">查看任務 <span aria-hidden="true">→</span></button><details><summary>安裝與登入</summary><p id="antigravity-reason">等待偵測結果。</p><p>安裝 Antigravity CLI（<code>agy</code>），在終端機完成帳號登入，再重新偵測。只有 IDE 啟動器並不足以接入任務。</p><a href="https://www.antigravity.google/docs/install?tab=cli" target="_blank" rel="noopener noreferrer">Antigravity 官方說明 ↗</a></details></div>
+      </article>
+    </section>
+
+    <section class="workbench" aria-label="任務控制與即時紀錄">
+      <div class="composer panel">
+        <div class="section-heading"><div><span class="eyebrow">GIVE CURIOSITY A TASK</span><h2>交辦一件事</h2></div><span class="small-tag">每位夥伴一次一件</span></div>
+        <form id="task-form">
+          <label for="task-mode">工作方式</label><select id="task-mode" disabled><option value="solo">單人任務</option><option value="team">團隊協作</option></select>
+          <label for="provider-select">交給誰</label><select id="provider-select" disabled><option value="codex">Codex · 等待偵測</option><option value="claude">Claude 4.6 · 等待偵測</option><option value="antigravity">Antigravity · 等待偵測</option></select>
+          <div class="model-field" id="model-field" hidden><label for="model-select">選用模型<span>CLI 提供的模型清單</span></label><select id="model-select" disabled aria-describedby="model-note"><option value="">沿用已設定模型</option></select><p id="model-note">實際回報的模型會顯示在任務紀錄。</p></div>
+          <div class="model-field effort-field" id="reasoning-effort-field" hidden><label for="reasoning-effort-select">思考深度<span>Codex · 依模型支援</span></label><select id="reasoning-effort-select" disabled aria-describedby="reasoning-effort-note"></select><p id="reasoning-effort-note">模型與深度會一起記錄；不顯示私有推理。</p></div>
+          <fieldset class="team-members" id="team-members" hidden><legend>一起工作的夥伴</legend><p id="team-lead-note"></p><label class="team-member" id="team-row-codex"><input type="checkbox" id="team-member-codex"><span><strong>Codex</strong><small id="team-model-codex"></small></span><em id="team-status-codex"></em></label><label class="team-member" id="team-row-claude"><input type="checkbox" id="team-member-claude"><span><strong>Claude 4.6</strong><small id="team-model-claude"></small></span><em id="team-status-claude"></em></label><label class="team-member" id="team-row-antigravity"><input type="checkbox" id="team-member-antigravity"><span><strong>Antigravity</strong><small id="team-model-antigravity"></small></span><em id="team-status-antigravity"></em></label><p class="team-explanation">主導者決定委派 → 夥伴以真實 CLI 執行 → 主導者統整。修改只留在隔離副本，完成後先審查再套用。若要調整夥伴模型，先切換房間設定，再選回主導者。</p><p id="team-validation" role="status"></p></fieldset>
+          <label for="task-prompt">任務內容 <span id="prompt-count">0 / 8000</span></label><textarea id="task-prompt" rows="7" maxlength="8000" placeholder="例如：檢查這個專案的架構與測試，找出三個值得優先改善的問題，附上檔案位置。請先提供分析，不要修改檔案。"></textarea>
+          <p class="form-note" id="form-note">等待 CLI 狀態後即可交辦。</p><button class="start-button" id="start-task" type="submit" disabled><span aria-hidden="true">↗</span><span id="start-label">啟動任務</span></button><p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+        </form>
+        <div class="scope-note" id="scope-note"><span aria-hidden="true">◎</span><p>追蹤<strong>從此頁啟動的 CLI 任務</strong>。交辦內容會透過所選 CLI 的帳號處理；可讀取這裡顯示的工作目錄。閒置小動作與台詞是預設演出。其他 IDE 或聊天視窗需另行連接。</p></div>
+      </div>
+
+      <div class="activity-panel panel">
+        <div class="section-heading"><div><span class="eyebrow">PUBLIC ACTIVITY, AS IT HAPPENS</span><h2 id="feed-title">任務紀錄</h2></div><span class="selected-provider-label" id="selected-provider-label">Codex</span></div>
+        <div class="history-controls"><label for="job-select" class="sr-only">選擇任務紀錄</label><select id="job-select" disabled><option>尚無任務紀錄</option></select><button class="cancel-button" id="cancel-task" disabled>停止任務</button></div>
+        <div class="job-summary" id="job-summary" hidden><div class="job-title-row"><span class="job-status" id="job-status"></span><time id="job-duration"></time></div><p id="job-prompt"></p><div class="job-meta"><span id="job-role" hidden></span><span id="job-model"></span><span id="job-reasoning-effort" hidden></span><span id="job-transport"></span><span id="job-session"></span></div><p class="job-error" id="job-error" hidden></p><p class="usage-summary" id="usage-summary" hidden></p></div>
+        <section class="team-progress" id="team-progress" hidden aria-label="團隊協作進度"><div class="team-progress-heading"><strong id="team-progress-title"></strong><span id="team-progress-phase"></span></div><p id="team-progress-budget"></p><p id="team-progress-members"></p><div id="team-job-links" class="team-job-links"></div><p class="team-progress-note">點選任務可查看該夥伴的真實公開紀錄；停止任一子任務會停止整個團隊。</p></section>
+        <section class="artifact-panel" id="artifact-panel" hidden aria-label="審查與套用修改"><div class="team-progress-heading"><strong>隔離副本的修改</strong><span id="artifact-status"></span></div><ul id="artifact-files"></ul><div class="artifact-actions"><button type="button" id="artifact-review" disabled>檢視差異</button><a id="artifact-download" download hidden>下載 patch</a><button type="button" id="artifact-apply" disabled>套用修改</button></div><p id="artifact-note" role="status">先檢視差異，再明確套用到原工作目錄。</p><pre id="artifact-diff" hidden tabindex="0" aria-label="修改差異文字"></pre></section>
+        <div class="feed-empty" id="job-empty"><span aria-hidden="true">⌁</span><h3>等一件值得動手的事</h3><p>交辦任務後，公開訊息、工具活動與結果會即時出現在這裡。</p></div>
+        <div class="event-feed" id="event-feed" role="log" aria-live="off" aria-label="任務公開事件紀錄" tabindex="0"></div>
+        <p class="feed-note" id="feed-note">僅顯示 CLI 提供的公開事件，不顯示私有推理。</p>
+      </div>
+    </section>
+  </main>
+  <footer class="desk-footer"><span>真實任務，各自精彩。</span><span id="last-sync">等待狀態同步</span></footer>
+  <script type="module" src="/static/monitor.js"></script>
+</body>
+</html>

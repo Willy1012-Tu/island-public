@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1518">
+  <meta name="description" content="觀察一位 AI 探險家，在浮空小島上探索、採集，並把無聊變成遊戲。">
+  <title>IslandWorld — 雲上小島</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23142529'/%3E%3Cpath d='M5 22 20 14 35 22 20 35Z' fill='%2388cda5'/%3E%3Cpath d='M5 22 20 30 35 22 20 36Z' fill='%23456c61'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script type="importmap">
+    {"imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+    }}
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="IslandWorld 首頁">
+      <svg class="brand-mark" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="m3 20 17-9 17 9-17 10L3 20Z" fill="currentColor"/><path d="m3 24 17 10 17-10-17 14L3 24Z" fill="currentColor" opacity=".45"/><path d="M20 3v11m-5-7 5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>ISLAND<span class="brand-light">WORLD</span><small>一座小島，無限種可能</small></span>
+    </a>
+    <div class="header-status">
+      <a class="mode-pill" href="/monitor">任務監控 ↗</a>
+      <span class="mode-pill" id="brain-mode">等待世界</span>
+      <span class="connection" id="connection" role="status"><i></i><span id="connection-text">連線中</span></span>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="sidebar" aria-label="探險家狀態與遊戲操作">
+      <div class="intro"><span class="eyebrow">AN AUTONOMOUS LITTLE WORLD</span><h1>雲上小島<span class="title-dot">.</span></h1><p>讓好奇心，在島上發生。</p></div>
+
+      <section class="glass thought-card" aria-labelledby="thought-heading">
+        <div class="card-label"><span id="thought-heading"><span class="spark">✦</span> 探險家的心聲</span><span class="tiny-label" id="thought-state">準備出發</span></div>
+        <p class="thought-text" id="thought" aria-live="polite">小島準備好了。下一個念頭，會把我帶去哪裡呢？</p>
+        <div class="current-action"><span class="activity-dot" id="activity-dot"></span><span id="action-label">等待世界狀態</span><span class="action-target" id="action-target"></span></div>
+        <div class="mini-game" id="mini-game" hidden><div class="game-label">靈感小遊戲</div><h2 id="game-name"></h2><p id="game-rules"></p></div>
+      </section>
+
+      <section class="glass vitals-card" aria-label="角色狀態">
+        <div class="meter-block" id="boredom-block"><div class="meter-heading"><span><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M6.5 8h.1m6.8 0h.1M7 13h6"/></svg>無聊指數</span><output id="boredom-value">—<small> / 100</small></output></div><div class="meter-track" id="boredom-meter" role="progressbar" aria-label="無聊指數" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="meter-fill boredom-fill" id="boredom-fill"></div></div><p class="meter-caption" id="boredom-caption">超過 70，讓想像力接手。</p></div>
+        <div class="meter-block"><div class="meter-heading"><span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="m11.5 2-7 9h5l-1 7 7-10h-5l1-6Z"/></svg>體力</span><output id="energy-value">—<small> / 100</small></output></div><div class="meter-track" id="energy-meter" role="progressbar" aria-label="體力" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="meter-fill energy-fill" id="energy-fill"></div></div></div>
+        <div class="inventory"><div><span class="resource-icon wood-icon" aria-hidden="true">▰</span><span>木材</span><strong id="wood-value">0</strong></div><div><span class="resource-icon stone-icon" aria-hidden="true">⬟</span><span>石材</span><strong id="stone-value">0</strong></div></div>
+      </section>
+
+      <section class="control-panel" aria-label="遊戲操作">
+        <button class="button button-primary" id="pause-button" disabled aria-pressed="false"><svg id="pause-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 5v10m6-10v10"/></svg><span id="pause-label">暫停模擬</span><kbd>Space</kbd></button>
+        <button class="button button-secondary" id="boredom-button" disabled><span class="button-spark" aria-hidden="true">✦</span><span>來點無聊</span><span class="button-add">+25</span><kbd>B</kbd></button>
+      </section>
+      <p class="simulation-note" id="simulation-note">每 0.5 秒，一個新的小小行動。</p>
+    </aside>
+
+    <section class="scene-panel" aria-label="可旋轉與縮放的 3D 浮空小島">
+      <div id="scene" class="scene-canvas"></div>
+      <div class="scene-grid" aria-hidden="true"></div>
+      <div class="scene-topline"><div><span class="eyebrow">THE ISLAND OBSERVATORY</span><p><span class="live-dot"></span><span id="world-label">20 × 20 的微型宇宙</span></p></div><button class="icon-button" id="reset-camera" title="重置鏡頭" aria-label="重置鏡頭"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6"/><path d="M12 8v8m-4-4h8" opacity=".5"/></svg></button></div>
+      <div class="connection-banner" id="connection-banner" hidden role="alert"></div>
+      <div class="scene-loading" id="scene-loading" role="status"><div class="loading-orbit" aria-hidden="true"><span>✦</span></div><h2 id="loading-title">正在喚醒小島</h2><p id="loading-message">把一點綠意，帶到雲端之上。</p><button class="button button-secondary" id="retry-scene" hidden>重新載入</button></div>
+      <div class="world-stats glass"><div><span>世界節拍</span><strong id="tick-value">0000</strong></div><div><span>完成計畫</span><strong id="plans-value">0</strong></div><div><span>創意遊戲</span><strong id="games-value">0</strong></div></div>
+      <div class="scene-bottomline"><div class="scene-legend"><span><i class="legend-dot agent-dot"></i>探險家</span><span><i class="legend-dot path-dot"></i>前進路徑</span></div><p class="camera-help"><span>左鍵 旋轉</span><span>滾輪 縮放</span><span>右鍵 平移</span></p></div>
+    </section>
+  </main>
+  <footer class="site-footer"><span><i></i> 一次思考，一步探索。</span><span id="footer-status">PYTHON SIMULATION · THREE.JS WORLD</span></footer>
+  <script type="module" src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "enabled": false,
+  "push": false,
+  "poll_seconds": 2,
+  "debounce_seconds": 8
+}

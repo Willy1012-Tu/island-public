@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "settings": {
+    "workspace": "C:/PLACEHOLDER_PROJECT/island-public",
+    "start_minimized": false,
+    "close_to_tray": true,
+    "window_width": 1440,
+    "window_height": 940,
+    "port": 0,
+    "monitor_timeout": 300
+  }
+}
